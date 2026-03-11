@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CureLink — Smart Healthcare</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:#080814;color:#fff;min-height:100vh}
+#root{min-height:100vh}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:#080814}::-webkit-scrollbar-thumb{background:#7c3aed;border-radius:4px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes ping{0%{transform:scale(1);opacity:.8}75%,100%{transform:scale(2);opacity:0}}
+.fu{animation:fadeUp .5s cubic-bezier(.22,1,.36,1) both}
+.float{animation:float 3.5s ease-in-out infinite}
+.inp{width:100%;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:11px;padding:11px 15px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:#fff;outline:none;transition:all .2s}
+.inp::placeholder{color:rgba(255,255,255,.22)}
+.inp:focus{border-color:#a78bfa;background:rgba(167,139,250,.07);box-shadow:0 0 0 3px rgba(167,139,250,.09)}
+.inp option{background:#111128;color:#fff}
+.btn-v{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .22s}
+.btn-v:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.5)}
+.btn-v:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-g{background:linear-gradient(135deg,#059669,#0891b2);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all .22s}
+.btn-g:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(5,150,105,.5)}
+.btn-g:disabled{opacity:.38;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;padding:9px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-ghost:hover{background:rgba(255,255,255,.11);color:#fff}
+.btn-red{background:rgba(220,38,38,.14);color:#f87171;border:1px solid rgba(220,38,38,.25);border-radius:8px;padding:6px 13px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-red:hover{background:rgba(220,38,38,.26)}
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.3px}
+.tag-v{background:rgba(124,58,237,.18);color:#c4b5fd;border:1px solid rgba(124,58,237,.25)}
+.tag-g{background:rgba(5,150,105,.18);color:#6ee7b7;border:1px solid rgba(5,150,105,.25)}
+.tag-r{background:rgba(220,38,38,.18);color:#fca5a5;border:1px solid rgba(220,38,38,.25)}
+.tag-b{background:rgba(8,145,178,.18);color:#67e8f9;border:1px solid rgba(8,145,178,.25)}
+.tag-y{background:rgba(217,119,6,.18);color:#fcd34d;border:1px solid rgba(217,119,6,.25)}
+.nav{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:9px;cursor:pointer;font-weight:500;font-size:13px;color:rgba(255,255,255,.42);transition:all .18s;margin-bottom:2px}
+.nav:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.78)}
+.nav.onV{background:rgba(124,58,237,.2);color:#c4b5fd;border:1px solid rgba(124,58,237,.22)}
+.nav.onG{background:rgba(5,150,105,.18);color:#6ee7b7;border:1px solid rgba(5,150,105,.2)}
+.lbl{font-size:10px;font-weight:800;color:rgba(255,255,255,.28);letter-spacing:1.2px;display:block;margin-bottom:6px;text-transform:uppercase}
+.card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:14px;padding:16px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,#7c3aed,#06b6d4,#10b981)}
+.dr-card{background:rgba(255,255,255,.03);border:1.5px solid rgba(255,255,255,.07);border-radius:14px;padding:16px;transition:all .24s;cursor:pointer;position:relative;overflow:hidden}
+.dr-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#7c3aed,#06b6d4)}
+.dr-card:hover{border-color:rgba(124,58,237,.38);background:rgba(124,58,237,.06);transform:translateY(-3px);box-shadow:0 12px 32px rgba(124,58,237,.16)}
+.dr-card.off{opacity:.42;cursor:not-allowed}
+.dr-card.off:hover{transform:none;border-color:rgba(255,255,255,.07);background:rgba(255,255,255,.03);box-shadow:none}
+.row{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:11px;margin-bottom:8px;flex-wrap:wrap;gap:9px}
+.stat{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:15px;text-align:center}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:18px;animation:fadeIn .2s ease}
+.modal{background:#0d0d22;border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:26px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;animation:fadeUp .3s cubic-bezier(.22,1,.36,1)}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;opacity:.22}
+.slot-chip{border:1.5px solid rgba(124,58,237,.25);background:rgba(124,58,237,.07);color:#c4b5fd;border-radius:7px;padding:7px 11px;font-size:12px;font-weight:700;cursor:pointer;transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif}
+.slot-chip:hover:not(:disabled){border-color:rgba(124,58,237,.5);background:rgba(124,58,237,.14)}
+.slot-chip.booked{background:rgba(220,38,38,.07);border-color:rgba(220,38,38,.2);color:rgba(248,113,113,.65);cursor:default}
+.slot-chip.wl-join{background:rgba(217,119,6,.07);border-color:rgba(217,119,6,.22);color:#fcd34d;cursor:pointer}
+.slot-chip.wl-join:hover{background:rgba(217,119,6,.16)}
+.slot-chip.sel{background:linear-gradient(135deg,#7c3aed,#4f46e5);border-color:#a78bfa;color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.4)}
+.slot-chip.mywl{background:rgba(217,119,6,.15);border-color:#fbbf24;color:#fef3c7;cursor:default}
+.time-btn{background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.52);border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;font-family:'Plus Jakarta Sans',sans-serif}
+.time-btn:hover{border-color:rgba(5,150,105,.4);color:#6ee7b7;background:rgba(5,150,105,.07)}
+.time-btn.picked{background:rgba(5,150,105,.2);border-color:#6ee7b7;color:#fff}
+.toggle{position:relative;width:46px;height:24px;display:inline-block}
+.toggle input{opacity:0;width:0;height:0}
+.tsl{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,.12);border-radius:24px;transition:.28s}
+.tsl:before{position:absolute;content:"";height:16px;width:16px;left:4px;bottom:4px;background:#fff;border-radius:50%;transition:.28s}
+input:checked+.tsl{background:linear-gradient(135deg,#10b981,#0891b2)}
+input:checked+.tsl:before{transform:translateX(22px)}
+.chat-user{background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border-radius:15px 15px 3px 15px;padding:10px 13px;max-width:80%;align-self:flex-end;font-size:13.5px;line-height:1.62;white-space:pre-wrap;word-break:break-word}
+.chat-ai{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.88);border-radius:15px 15px 15px 3px;padding:10px 13px;max-width:85%;align-self:flex-start;font-size:13.5px;line-height:1.68;white-space:pre-wrap;word-break:break-word}
+.notif{position:fixed;bottom:22px;right:22px;z-index:2000;width:340px;background:linear-gradient(135deg,#0f172a,#1e1b4b);border:1.5px solid rgba(124,58,237,.45);border-radius:16px;padding:20px;box-shadow:0 18px 50px rgba(124,58,237,.38);animation:slideIn .45s cubic-bezier(.22,1,.36,1)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const{useState,useEffect,useRef}=React;
+
+/* ══════════════════════
+   API KEY — YAHAN DAALO
+   console.anthropic.com
+══════════════════════ */
+const API_KEY="YOUR_API_KEY_HERE";
+
+const SPECS=["Cardiologist","Dermatologist","Neurologist","Orthopedic","Pediatrician","Gynecologist","ENT Specialist","Psychiatrist","General Physician","Dentist"];
+const ALL_TIMES=["08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM","01:00 PM","01:30 PM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM","05:00 PM","05:30 PM","06:00 PM","06:30 PM","07:00 PM","07:30 PM"];
+const QUOTES=["To cure sometimes, to relieve often, to comfort always.","The good physician treats the disease; the great treats the patient.","Medicine is both a science and an art of humanity.","Wherever there is love for the patient, there is love for the art."];
+const DUMMY_DOCS=[
+  {id:"NMC20001",name:"Dr. Rajesh Kumar",spec:"General Physician",age:52,city:"Phagwara",state:"Punjab",fees:300,quote:"Your health is my priority — always.",slots:["09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","11:30 AM","04:00 PM","04:30 PM","05:00 PM","05:30 PM"],bk:[],apts:[],waitlist:{},on:true},
+  {id:"NMC20002",name:"Dr. Priya Sharma",spec:"Gynecologist",age:44,city:"Phagwara",state:"Punjab",fees:500,quote:"Women's health and wellness is my calling.",slots:["10:00 AM","10:30 AM","11:00 AM","11:30 AM","02:00 PM","02:30 PM","03:00 PM","03:30 PM"],bk:[],apts:[],waitlist:{},on:true},
+  {id:"NMC20003",name:"Dr. Amandeep Singh",spec:"Orthopedic",age:48,city:"Phagwara",state:"Punjab",fees:600,quote:"Moving you towards a pain-free life.",slots:["09:00 AM","09:30 AM","10:00 AM","10:30 AM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM"],bk:[],apts:[],waitlist:{},on:true},
+  {id:"NMC20004",name:"Dr. Sunita Verma",spec:"Pediatrician",age:40,city:"Phagwara",state:"Punjab",fees:400,quote:"Every child deserves the very best start in life.",slots:["10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","04:00 PM","04:30 PM","05:00 PM","05:30 PM"],bk:[],apts:[],waitlist:{},on:true},
+  {id:"NMC20005",name:"Dr. Harpreet Kaur",spec:"Dermatologist",age:38,city:"Phagwara",state:"Punjab",fees:450,quote:"Healthy skin is a reflection of overall wellness.",slots:["10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM"],bk:[],apts:[],waitlist:{},on:true},
+  {id:"NMC20006",name:"Dr. Vikram Malhotra",spec:"Cardiologist",age:55,city:"Phagwara",state:"Punjab",fees:800,quote:"A healthy heart is the foundation of a happy life.",slots:["09:00 AM","09:30 AM","10:00 AM","02:00 PM","02:30 PM","03:00 PM","05:00 PM","05:30 PM"],bk:[],apts:[],waitlist:{},on:true},
+  {id:"NMC20007",name:"Dr. Gurpreet Singh",spec:"ENT Specialist",age:46,city:"Phagwara",state:"Punjab",fees:350,quote:"Listen to your body — it always speaks the truth.",slots:["09:30 AM","10:00 AM","10:30 AM","11:00 AM","03:00 PM","03:30 PM","04:00 PM","04:30 PM","05:00 PM"],bk:[],apts:[],waitlist:{},on:true},
+  {id:"NMC20008",name:"Dr. Mandeep Bhatia",spec:"Dentist",age:41,city:"Phagwara",state:"Punjab",fees:250,quote:"Your smile is my masterpiece.",slots:["09:00 AM","09:30 AM","10:00 AM","10:30 AM","11:00 AM","02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM"],bk:[],apts:[],waitlist:{},on:true},
+  {id:"NMC20009",name:"Dr. Navjot Dhillon",spec:"Neurologist",age:50,city:"Phagwara",state:"Punjab",fees:700,quote:"The brain is the most complex organ — I decode it daily.",slots:["10:00 AM","10:30 AM","11:00 AM","02:30 PM","03:00 PM","03:30 PM","04:00 PM"],bk:[],apts:[],waitlist:{},on:false},
+  {id:"NMC20010",name:"Dr. Simran Arora",spec:"Psychiatrist",age:43,city:"Phagwara",state:"Punjab",fees:550,quote:"Mental health is just as important as physical health.",slots:["11:00 AM","11:30 AM","12:00 PM","04:00 PM","04:30 PM","05:00 PM","05:30 PM"],bk:[],apts:[],waitlist:{},on:true}
+];
+const LS={
+  get:(k,fb=null)=>{try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch{return fb;}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));}catch{}},
+  del:(k)=>{try{localStorage.removeItem(k);}catch{}}
+};
+/* Always merge dummy docs — new doctors always visible, existing bookings preserved */
+(()=>{
+  const saved=LS.get("cl_docs")||[];
+  const merged=DUMMY_DOCS.map(dd=>{
+    const existing=saved.find(s=>s.id===dd.id);
+    return existing?existing:dd; // keep existing data, add new ones fresh
+  });
+  // also keep any real doctor accounts (NMC IDs not in DUMMY_DOCS)
+  const realDrs=saved.filter(s=>!DUMMY_DOCS.find(dd=>dd.id===s.id));
+  LS.set("cl_docs",[...merged,...realDrs]);
+})();
+const sortTimes=arr=>[...arr].sort((a,b)=>{const f=x=>{const[h,m]=x.split(":").map(Number);return(x.includes("PM")&&h!==12?h+12:x.includes("AM")&&h===12?0:h)*60+m;};return f(a)-f(b);});
+const Av=({name,sz=40,g=["#7c3aed","#4f46e5"]})=>{const ini=(name||"?").split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();return <div style={{width:sz,height:sz,borderRadius:"50%",background:`linear-gradient(135deg,${g[0]},${g[1]})`,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:800,fontSize:sz*.36,flexShrink:0,fontFamily:"inherit",boxShadow:`0 3px 10px ${g[0]}44`}}>{ini}</div>;};
+const Spin=()=><span style={{display:"inline-block",width:15,height:15,border:"2px solid rgba(255,255,255,.25)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin .65s linear infinite",verticalAlign:"middle"}}/>;
+
+function Toast({msg,type,onClose}){
+  useEffect(()=>{const t=setTimeout(onClose,3800);return()=>clearTimeout(t);},[]);
+  const bg=type==="ok"?"linear-gradient(135deg,#059669,#0891b2)":type==="new"?"linear-gradient(135deg,#7c3aed,#4f46e5)":"linear-gradient(135deg,#d97706,#92400e)";
+  return <div style={{position:"fixed",top:18,right:18,zIndex:9999,background:bg,color:"#fff",padding:"12px 17px",borderRadius:12,fontWeight:600,fontSize:13.5,boxShadow:"0 8px 26px rgba(0,0,0,.42)",animation:"slideIn .4s cubic-bezier(.22,1,.36,1)",display:"flex",alignItems:"center",gap:9,maxWidth:310}}><span style={{fontSize:17}}>{type==="ok"?"👋":type==="new"?"🎉":"🔔"}</span>{msg}</div>;
+}
+
+/* LANDING */
+function Landing({onChoice}){
+  return(
+    <div style={{minHeight:"100vh",background:"#080814",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,position:"relative",overflow:"hidden"}}>
+      <div className="orb" style={{width:550,height:550,background:"#7c3aed",top:-180,left:-180}}/>
+      <div className="orb" style={{width:400,height:400,background:"#0891b2",bottom:-120,right:-120}}/>
+      <div className="orb" style={{width:300,height:300,background:"#10b981",bottom:60,left:"35%"}}/>
+      <div className="fu" style={{textAlign:"center",marginBottom:48}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,justifyContent:"center",marginBottom:12}}>
+          <div style={{width:52,height:52,borderRadius:15,background:"linear-gradient(135deg,#7c3aed,#06b6d4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:26,boxShadow:"0 8px 30px rgba(124,58,237,.55)"}}>+</div>
+          <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:48,fontWeight:900,background:"linear-gradient(135deg,#c4b5fd,#67e8f9,#6ee7b7)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>CureLink</h1>
+        </div>
+        <p style={{color:"rgba(255,255,255,.4)",fontSize:15}}>Smart Healthcare. Seamless Connections.</p>
+        <p style={{color:"rgba(255,255,255,.2)",fontSize:12,marginTop:6}}>Patient & Doctor can use this simultaneously from the same file</p>
+      </div>
+      <div style={{display:"flex",gap:22,flexWrap:"wrap",justifyContent:"center",width:"100%",maxWidth:820}}>
+        {[["user","🧑‍⚕️","I'm a Patient","Book appointments, AI symptom checker, waiting list","rgba(124,58,237,.07)","rgba(124,58,237,.2)","rgba(124,58,237,.6)","0 20px 55px rgba(124,58,237,.28)","tag-v","btn-v","Continue as Patient →",["📅 Book Doctor Appointments","🤖 AI Symptom Checker","⏳ Smart Waiting List","📋 Appointment History"]],
+           ["doctor","👨‍⚕️","I'm a Doctor","Manage appointments, set slots, view waiting lists","rgba(5,150,105,.07)","rgba(5,150,105,.2)","rgba(5,150,105,.6)","0 20px 55px rgba(5,150,105,.28)","tag-g","btn-g","Continue as Doctor →",["🗓️ Set Your Own Time Slots","🔘 Toggle Availability","⏳ View Waiting Lists","📊 Manage Appointments"]]
+        ].map(([k,em,title,desc,bg,border,hborder,shadow,tag,btn,cta,features])=>(
+          <div key={k} className="fu" onClick={()=>onChoice(k)} style={{animationDelay:k==="user"?".07s":".15s",flex:"1 1 310px",maxWidth:360,background:bg,border:`2px solid ${border}`,borderRadius:26,padding:"34px 30px",cursor:"pointer",transition:"all .28s"}}
+            onMouseEnter={e=>{e.currentTarget.style.borderColor=hborder;e.currentTarget.style.transform="translateY(-5px)";e.currentTarget.style.boxShadow=shadow;}}
+            onMouseLeave={e=>{e.currentTarget.style.borderColor=border;e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
+            <div style={{fontSize:54,marginBottom:16}} className="float">{em}</div>
+            <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:25,color:"#fff",marginBottom:8}}>{title}</h2>
+            <p style={{color:"rgba(255,255,255,.4)",fontSize:13.5,lineHeight:1.75,marginBottom:18}}>{desc}</p>
+            {features.map(f=><div key={f} style={{color:"rgba(255,255,255,.55)",fontSize:12.5,marginBottom:6}}>{f}</div>)}
+            <div className={btn} style={{display:"block",textAlign:"center",padding:"12px",marginTop:18,fontSize:14}}>{cta}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* PATIENT LOGIN */
+function PatientLogin({onBack,onLogin}){
+  const[f,setF]=useState({name:"",email:"",phone:""});const[err,setErr]=useState("");
+  const go=()=>{
+    setErr("");
+    if(!f.name.trim()||!f.email.trim()||!f.phone.trim())return setErr("All fields are required.");
+    if(!/\S+@\S+\.\S+/.test(f.email))return setErr("Enter a valid email.");
+    if(!/^\d{10}$/.test(f.phone))return setErr("Enter a valid 10-digit phone number.");
+    onLogin(f);
+  };
+  return(
+    <div style={{minHeight:"100vh",background:"#080814",display:"flex",position:"relative",overflow:"hidden"}}>
+      <div className="orb" style={{width:600,height:600,background:"#7c3aed",top:-200,left:-200}}/>
+      <div className="orb" style={{width:380,height:380,background:"#4f46e5",bottom:-80,right:-60}}/>
+      <div style={{width:"44%",display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",padding:44,position:"relative",zIndex:1}}>
+        <div className="fu" style={{textAlign:"center"}}>
+          <div style={{fontSize:68,marginBottom:16}} className="float">🧑‍⚕️</div>
+          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:32,color:"#fff",marginBottom:10}}>Patient Portal</h2>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,marginTop:26}}>
+            {[["🤖","AI Checker"],["📅","Easy Booking"],["⏳","Waiting List"],["🔒","Account Saved"]].map(([ic,lb])=>(
+              <div key={lb} style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",borderRadius:10,padding:"11px",textAlign:"center"}}>
+                <div style={{fontSize:20,marginBottom:4}}>{ic}</div><div style={{color:"rgba(255,255,255,.5)",fontSize:11,fontWeight:700}}>{lb}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:30,position:"relative",zIndex:1}}>
+        <div className="fu" style={{width:"100%",maxWidth:400,animationDelay:".06s"}}>
+          <button className="btn-ghost" onClick={onBack} style={{marginBottom:22,fontSize:12,padding:"8px 15px"}}>← Back</button>
+          <span className="tag tag-v" style={{marginBottom:11,display:"inline-block"}}>PATIENT LOGIN</span>
+          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:27,color:"#fff",marginBottom:5}}>Sign In</h2>
+          <p style={{color:"rgba(255,255,255,.3)",fontSize:12.5,marginBottom:22}}>Same email + phone = previous account restored</p>
+          <div style={{display:"flex",flexDirection:"column",gap:13}}>
+            {[["FULL NAME","name","text","Your full name"],["EMAIL","email","email","your@email.com"],["PHONE","phone","tel","10-digit number"]].map(([lb,k,t,ph])=>(
+              <div key={k}><label className="lbl">{lb}</label>
+                <input className="inp" type={t} placeholder={ph} value={f[k]} onChange={e=>setF({...f,[k]:k==="phone"?e.target.value.replace(/\D/g,"").slice(0,10):e.target.value})} onKeyDown={e=>e.key==="Enter"&&go()}/>
+              </div>
+            ))}
+            {err&&<div style={{background:"rgba(220,38,38,.1)",border:"1px solid rgba(220,38,38,.2)",borderRadius:9,padding:"9px 13px",color:"#f87171",fontSize:13}}>⚠ {err}</div>}
+            <button className="btn-v" onClick={go} style={{width:"100%",padding:"12px",fontSize:14,marginTop:4}}>Enter Patient Portal →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* DOCTOR LOGIN */
+function DoctorLogin({onBack,onLogin}){
+  const[f,setF]=useState({drName:"",spec:"",regId:""});const[err,setErr]=useState("");
+  const go=()=>{
+    setErr("");
+    if(!f.drName.trim()||!f.spec||!f.regId.trim())return setErr("All fields are required.");
+    if(!f.regId.toUpperCase().startsWith("NMC"))return setErr("NMC Registration ID must start with 'NMC'.");
+    onLogin({name:f.drName.trim(),spec:f.spec,regId:f.regId.toUpperCase().trim()});
+  };
+  return(
+    <div style={{minHeight:"100vh",background:"#040f0d",display:"flex",position:"relative",overflow:"hidden"}}>
+      <div className="orb" style={{width:600,height:600,background:"#059669",top:-200,left:-200}}/>
+      <div className="orb" style={{width:380,height:380,background:"#0891b2",bottom:-80,right:-60}}/>
+      <div style={{width:"44%",display:"flex",flexDirection:"column",justifyContent:"center",alignItems:"center",padding:44,position:"relative",zIndex:1}}>
+        <div className="fu" style={{textAlign:"center"}}>
+          <div style={{fontSize:68,marginBottom:16}} className="float">👨‍⚕️</div>
+          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:32,color:"#fff",marginBottom:10}}>Doctor Portal</h2>
+          {["✅ NMC Registered Doctors Only","🗓️ Control Your Own Slots","⏳ View Waiting Lists","🔘 Toggle Availability"].map(x=>(
+            <div key={x} style={{background:"rgba(255,255,255,.04)",border:"1px solid rgba(5,150,105,.18)",borderRadius:9,padding:"9px 13px",color:"rgba(255,255,255,.58)",fontSize:12.5,textAlign:"left",marginBottom:7}}>{x}</div>
+          ))}
+        </div>
+      </div>
+      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",padding:30,position:"relative",zIndex:1}}>
+        <div className="fu" style={{width:"100%",maxWidth:400,animationDelay:".06s"}}>
+          <button className="btn-ghost" onClick={onBack} style={{marginBottom:22,fontSize:12,padding:"8px 15px"}}>← Back</button>
+          <span className="tag tag-g" style={{marginBottom:11,display:"inline-block"}}>DOCTOR LOGIN</span>
+          <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:27,color:"#fff",marginBottom:5}}>Access Your Practice</h2>
+          <p style={{color:"rgba(255,255,255,.3)",fontSize:12.5,marginBottom:22}}>Same NMC ID = full profile + appointments restored</p>
+          <div style={{display:"flex",flexDirection:"column",gap:13}}>
+            <div><label className="lbl">FULL DOCTOR NAME</label><input className="inp" placeholder="Dr. Full Name" value={f.drName} onChange={e=>setF({...f,drName:e.target.value})}/></div>
+            <div><label className="lbl">SPECIALITY</label>
+              <select className="inp" value={f.spec} onChange={e=>setF({...f,spec:e.target.value})} style={{cursor:"pointer"}}>
+                <option value="">Select speciality</option>{SPECS.map(s=><option key={s}>{s}</option>)}
+              </select>
+            </div>
+            <div><label className="lbl">NMC REGISTRATION ID</label><input className="inp" placeholder="e.g. NMC12345" value={f.regId} onChange={e=>setF({...f,regId:e.target.value})} onKeyDown={e=>e.key==="Enter"&&go()}/></div>
+            {err&&<div style={{background:"rgba(220,38,38,.1)",border:"1px solid rgba(220,38,38,.2)",borderRadius:9,padding:"9px 13px",color:"#f87171",fontSize:13}}>⚠ {err}</div>}
+            <button className="btn-g" onClick={go} style={{width:"100%",padding:"12px",fontSize:14,marginTop:4}}>Enter Doctor Portal →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* DOCTOR SETUP */
+function DoctorSetup({loginInfo,onComplete}){
+  const[step,setStep]=useState(1);const[p,setP]=useState({age:"",city:"",state:"",fees:"",quote:""});
+  const[sel,setSel]=useState([]);const[err,setErr]=useState("");
+  const tog=t=>setSel(s=>s.includes(t)?s.filter(x=>x!==t):sortTimes([...s,t]));
+  const next=()=>{setErr("");if(!p.age||!p.city||!p.state||!p.fees)return setErr("Fill all required fields.");if(isNaN(p.fees)||+p.fees<100)return setErr("Minimum fee is ₹100.");setStep(2);};
+  const finish=()=>{if(!sel.length)return setErr("Select at least one slot.");onComplete({...loginInfo,...p,fees:+p.fees,slots:sel,bk:[],apts:[],waitlist:{},on:false});};
+  return(
+    <div style={{minHeight:"100vh",background:"#040f0d",display:"flex",alignItems:"center",justifyContent:"center",padding:22,position:"relative",overflow:"hidden"}}>
+      <div className="orb" style={{width:500,height:500,background:"#059669",top:-150,right:-100}}/>
+      <div className="orb" style={{width:380,height:380,background:"#7c3aed",bottom:-100,left:-80}}/>
+      <div className="fu" style={{width:"100%",maxWidth:600,position:"relative",zIndex:1}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:22}}>
+          {[1,2].map(n=>(
+            <React.Fragment key={n}>
+              <div style={{width:28,height:28,borderRadius:"50%",background:step>=n?"linear-gradient(135deg,#059669,#0891b2)":"rgba(255,255,255,.08)",display:"flex",alignItems:"center",justifyContent:"center",color:step>=n?"#fff":"rgba(255,255,255,.22)",fontWeight:700,fontSize:12,flexShrink:0}}>{step>n?"✓":n}</div>
+              <span style={{fontSize:12.5,color:step>=n?"rgba(255,255,255,.78)":"rgba(255,255,255,.22)",fontWeight:600}}>{n===1?"Profile Setup":"Set Time Slots"}</span>
+              {n<2&&<div style={{flex:1,height:2,background:step>1?"linear-gradient(90deg,#059669,#0891b2)":"rgba(255,255,255,.08)",borderRadius:2,minWidth:18}}/>}
+            </React.Fragment>
+          ))}
+        </div>
+        <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(5,150,105,.15)",borderRadius:18,padding:26}}>
+          <div style={{display:"flex",gap:12,alignItems:"center",marginBottom:20,padding:13,background:"rgba(5,150,105,.07)",borderRadius:11,border:"1px solid rgba(5,150,105,.14)"}}>
+            <Av name={loginInfo.name} sz={44} g={["#059669","#0891b2"]}/><div><div style={{fontWeight:700,color:"#fff",fontSize:14}}>{loginInfo.name}</div><span className="tag tag-g">{loginInfo.spec}</span><div style={{fontSize:11,color:"rgba(255,255,255,.28)",marginTop:2}}>Reg: {loginInfo.regId}</div></div>
+          </div>
+          {step===1&&<>
+            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"#fff",marginBottom:16}}>Complete Your Profile</h3>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+              {[["AGE *","age","number","e.g. 45"],["FEES (₹) *","fees","number","e.g. 500"],["CITY *","city","text","Phagwara"],["STATE *","state","text","Punjab"]].map(([lb,k,t,ph])=>(
+                <div key={k}><label className="lbl">{lb}</label><input className="inp" type={t} placeholder={ph} value={p[k]} onChange={e=>setP({...p,[k]:e.target.value})}/></div>
+              ))}
+              <div style={{gridColumn:"1/-1"}}><label className="lbl">QUOTE (Optional)</label><input className="inp" placeholder="Share a thought with your patients..." value={p.quote} onChange={e=>setP({...p,quote:e.target.value})}/></div>
+            </div>
+            {err&&<div style={{background:"rgba(220,38,38,.09)",border:"1px solid rgba(220,38,38,.18)",borderRadius:9,padding:"9px 13px",color:"#f87171",fontSize:12.5,marginTop:12}}>⚠ {err}</div>}
+            <button className="btn-g" onClick={next} style={{width:"100%",padding:12,marginTop:16,fontSize:13.5}}>Next: Set Slots →</button>
+          </>}
+          {step===2&&<>
+            <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"#fff",marginBottom:16}}>Choose Your Time Slots</h3>
+            {[["🌅 MORNING",ALL_TIMES.filter(t=>t.includes("AM"))],["🌤️ AFTERNOON & EVENING",ALL_TIMES.filter(t=>t.includes("PM"))]].map(([hd,slots])=>(
+              <div key={hd} style={{marginBottom:13}}>
+                <div className="lbl" style={{marginBottom:8}}>{hd}</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{slots.map(t=><button key={t} className={"time-btn"+(sel.includes(t)?" picked":"")} onClick={()=>tog(t)}>{t}</button>)}</div>
+              </div>
+            ))}
+            {sel.length>0&&<div style={{background:"rgba(5,150,105,.07)",border:"1px solid rgba(5,150,105,.16)",borderRadius:10,padding:11,marginBottom:12}}>
+              <div className="lbl" style={{color:"#6ee7b7",marginBottom:5}}>SELECTED: {sel.length} slots</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:4}}>{sel.map(s=><span key={s} className="tag tag-g" style={{fontSize:10}}>{s}</span>)}</div>
+            </div>}
+            {err&&<div style={{background:"rgba(220,38,38,.09)",border:"1px solid rgba(220,38,38,.18)",borderRadius:9,padding:"9px 13px",color:"#f87171",fontSize:12.5,marginBottom:12}}>⚠ {err}</div>}
+            <div style={{display:"flex",gap:9}}>
+              <button className="btn-ghost" onClick={()=>{setStep(1);setErr("");}}>← Back</button>
+              <button className="btn-g" onClick={finish} style={{flex:1,padding:12,fontSize:13.5}}>Complete Setup →</button>
+            </div>
+          </>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* AI CHECKER — FIXED with anthropic-dangerous-direct-browser-access header */
+function AiCheck(){
+  const[msgs,setMsgs]=useState([{r:"ai",t:"Hello! I'm CureAI 🤖\n\nDescribe your symptoms or ask about any medicine. I'll help assess your condition.\n\n⚠️ I'm an AI assistant — not a substitute for a real doctor. Always consult a qualified physician."}]);
+  const[inp,setInp]=useState("");const[load,setLoad]=useState(false);
+  const bot=useRef(null);
+  useEffect(()=>{bot.current?.scrollIntoView({behavior:"smooth"});},[msgs,load]);
+  const apiSet=API_KEY!=="YOUR_API_KEY_HERE";
+  const send=async()=>{
+    if(!inp.trim()||load)return;
+    const um=inp.trim();setInp("");setLoad(true);
+    setMsgs(m=>[...m,{r:"user",t:um}]);
+    if(!apiSet){setMsgs(m=>[...m,{r:"ai",t:"⚠️ API Key not set!\n\nTo fix:\n1. Open this HTML file in Notepad/VS Code\n2. Find: const API_KEY = \"YOUR_API_KEY_HERE\"\n3. Replace with your key from console.anthropic.com\n4. Save and refresh"}]);setLoad(false);return;}
+    try{
+      const history=msgs.slice(1).map(m=>({role:m.r==="ai"?"assistant":"user",content:m.t}));
+      const res=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          "x-api-key":API_KEY,
+          "anthropic-version":"2023-06-01",
+          "anthropic-dangerous-direct-browser-access":"true"
+        },
+        body:JSON.stringify({
+          model:"claude-sonnet-4-20250514",max_tokens:1024,
+          system:"You are CureAI, a compassionate medical AI for CureLink India. Assess symptoms thoroughly, explain medicines (dosage, side effects, interactions), provide health guidance. For HIGH RISK symptoms (chest pain, stroke, severe breathing issues, heavy bleeding), always end with: '🚨 SEEK IMMEDIATE MEDICAL ATTENTION — Go to emergency room or call 112 immediately.' Use bullet points for clarity. Be empathetic and precise.",
+          messages:[...history,{role:"user",content:um}]
+        })
+      });
+      if(!res.ok){
+        const e=await res.json().catch(()=>({}));
+        const msg=res.status===401?"❌ Invalid API Key. Go to console.anthropic.com to get your key.":res.status===429?"⏳ Rate limit reached. Wait a moment and try again.":("Error "+res.status+": "+(e?.error?.message||"Unknown"));
+        setMsgs(m=>[...m,{r:"ai",t:"⚠️ "+msg}]);
+      }else{
+        const d=await res.json();
+        const txt=d.content?.filter(c=>c.type==="text").map(c=>c.text).join("")||"Sorry, no response generated. Please try again.";
+        setMsgs(m=>[...m,{r:"ai",t:txt}]);
+      }
+    }catch(e){setMsgs(m=>[...m,{r:"ai",t:"⚠️ Network error: "+e.message+"\n\nCheck your internet connection."}]);}
+    setLoad(false);
+  };
+  return(
+    <div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 150px)",minHeight:500}}>
+      <div style={{background:"linear-gradient(135deg,#3b0764,#1e1b4b)",borderRadius:"14px 14px 0 0",padding:"14px 18px",display:"flex",alignItems:"center",gap:12,flexShrink:0}}>
+        <div style={{fontSize:28,animation:"float 3s ease-in-out infinite"}}>🤖</div>
+        <div>
+          <div style={{color:"#fff",fontWeight:800,fontSize:15,fontFamily:"'Playfair Display',serif"}}>CureAI — Symptom Checker</div>
+          <div style={{color:"rgba(255,255,255,.4)",fontSize:11.5}}>Powered by Claude AI • Ask anything about your health</div>
+        </div>
+        <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6}}>
+          <div style={{width:8,height:8,borderRadius:"50%",background:apiSet?"#10b981":"#f87171",flexShrink:0}}/>
+          <span style={{fontSize:11,color:apiSet?"#6ee7b7":"#f87171",fontWeight:700}}>{apiSet?"LIVE":"KEY MISSING"}</span>
+        </div>
+      </div>
+      {!apiSet&&<div style={{background:"rgba(220,38,38,.1)",border:"1px solid rgba(220,38,38,.2)",padding:"10px 15px",fontSize:12.5,color:"#f87171",flexShrink:0}}>⚠️ Open this HTML file in Notepad → find <code style={{background:"rgba(255,255,255,.1)",padding:"1px 5px",borderRadius:4}}>API_KEY = "YOUR_API_KEY_HERE"</code> → replace with key from console.anthropic.com</div>}
+      <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10,background:"rgba(255,255,255,.015)"}}>
+        {msgs.map((m,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:m.r==="user"?"flex-end":"flex-start"}}>
+            <div className={m.r==="user"?"chat-user":"chat-ai"}>
+              {m.r==="ai"&&<span style={{display:"block",fontSize:9,color:"#a78bfa",fontWeight:800,marginBottom:4,letterSpacing:"1.2px"}}>CUREAI</span>}
+              {m.t}
+            </div>
+          </div>
+        ))}
+        {load&&<div style={{display:"flex"}}><div className="chat-ai" style={{display:"flex",gap:5,alignItems:"center"}}>{[0,.18,.36].map(d=><div key={d} style={{width:7,height:7,borderRadius:"50%",background:"#a78bfa",animation:"pulse 1s "+d+"s infinite"}}/>)}</div></div>}
+        <div ref={bot}/>
+      </div>
+      <div style={{padding:"10px 12px",background:"rgba(255,255,255,.03)",borderRadius:"0 0 14px 14px",borderTop:"1px solid rgba(255,255,255,.07)",display:"flex",gap:8,flexShrink:0}}>
+        <input className="inp" placeholder="Describe your symptoms or ask about medicine..." value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==="Enter"&&!e.shiftKey&&send()} style={{flex:1}}/>
+        <button className="btn-v" onClick={send} disabled={load} style={{padding:"10px 15px",flexShrink:0}}>{load?<Spin/>:"Send"}</button>
+      </div>
+    </div>
+  );
+}
+
+/* SLOT FREED POPUP */
+function SlotPopup({data,onBook,onDismiss}){
+  const[sec,setSec]=useState(30);
+  useEffect(()=>{const t=setInterval(()=>setSec(s=>{if(s<=1){onDismiss();return 0;}return s-1;}),1000);return()=>clearInterval(t);},[]);
+  return(
+    <div className="notif">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:13}}>
+        <div style={{display:"flex",gap:10,alignItems:"center"}}>
+          <div style={{width:42,height:42,borderRadius:11,background:"linear-gradient(135deg,#7c3aed,#4f46e5)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>🔔</div>
+          <div><div style={{fontWeight:800,color:"#fff",fontSize:14}}>Slot Just Freed Up!</div><div style={{color:"rgba(255,255,255,.4)",fontSize:11,marginTop:1}}>You are #1 on the waitlist</div></div>
+        </div>
+        <button onClick={onDismiss} style={{background:"none",border:"none",color:"rgba(255,255,255,.28)",fontSize:18,cursor:"pointer"}}>✕</button>
+      </div>
+      <div style={{background:"rgba(124,58,237,.1)",border:"1px solid rgba(124,58,237,.2)",borderRadius:11,padding:"11px 13px",marginBottom:13}}>
+        <div style={{color:"rgba(255,255,255,.42)",fontSize:10,fontWeight:800,letterSpacing:"1px",marginBottom:3}}>AVAILABLE NOW</div>
+        <div style={{fontWeight:700,color:"#c4b5fd",fontSize:13.5}}>{data.drName}</div>
+        <div style={{color:"rgba(255,255,255,.65)",fontSize:12.5,marginTop:3}}>🕒 {data.slot} • ₹{data.fees}</div>
+        <div style={{color:"rgba(255,255,255,.35)",fontSize:11,marginTop:3}}>📍 {data.city}</div>
+      </div>
+      <div style={{display:"flex",gap:8}}>
+        <button className="btn-v" onClick={onBook} style={{flex:1,padding:"9px",fontSize:13}}>Book This Slot →</button>
+        <button className="btn-ghost" onClick={onDismiss} style={{fontSize:11,padding:"9px 12px",color:"rgba(255,255,255,.35)"}}>Skip ({sec}s)</button>
+      </div>
+      <div style={{height:3,background:"rgba(255,255,255,.07)",borderRadius:3,marginTop:11,overflow:"hidden"}}>
+        <div style={{height:"100%",background:"linear-gradient(90deg,#7c3aed,#4f46e5)",width:((sec/30)*100)+"%",transition:"width 1s linear",borderRadius:3}}/>
+      </div>
+    </div>
+  );
+}
+
+/* BOOK MODAL */
+function BookModal({doc,user,onClose,onBook,onJoinWaitlist}){
+  const[sel,setSel]=useState(null);const[notes,setNotes]=useState("");const[done,setDone]=useState(false);const[wlDone,setWlDone]=useState(null);const[bookErr,setBookErr]=useState("");
+  const today=new Date().toLocaleDateString("en-IN");
+  const todayApts=user.apts.filter(a=>a.status==="Confirmed"&&a.date===today);
+  const myTodaySlots=todayApts.map(a=>a.slot);
+  const alreadyThisDr=todayApts.some(a=>a.drId===doc.id);
+  const joinWL=s=>{onJoinWaitlist(doc.id,s);setWlDone(s);};
+  const myWlPos=s=>(doc.waitlist||{})[s]?.findIndex(w=>w.email===user.email)??-1;
+  const go=()=>{
+    setBookErr("");
+    if(!sel)return;
+    if(alreadyThisDr)return setBookErr("Aapne aaj "+doc.name+" ke saath pehle se appointment book ki hai. Ek doctor ke saath ek din mein ek hi appointment.");
+    if(myTodaySlots.includes(sel))return setBookErr("Aapki aaj "+sel+" pe already ek appointment hai. Same time slot pe do appointments nahi ho sakti.");
+    onBook(doc,sel,notes);setDone(true);setTimeout(onClose,2600);
+  };
+  return(
+    <div className="overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal">
+        {done?<div style={{textAlign:"center",padding:"24px 0"}}><div style={{fontSize:54,marginBottom:12}}>✅</div><h3 style={{fontFamily:"'Playfair Display',serif",fontSize:21,color:"#fff",marginBottom:6}}>Appointment Confirmed!</h3><p style={{color:"rgba(255,255,255,.45)"}}>Slot <strong style={{color:"#a78bfa"}}>{sel}</strong> with <strong style={{color:"#67e8f9"}}>{doc.name}</strong></p></div>
+        :<>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:17}}>
+            <div><h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"#fff"}}>Book Appointment</h3><p style={{color:"rgba(255,255,255,.32)",fontSize:11.5,marginTop:2}}>🟢 Free = Book directly • 🔴 Booked = Join waitlist</p></div>
+            <button onClick={onClose} style={{background:"none",border:"none",fontSize:20,cursor:"pointer",color:"rgba(255,255,255,.28)"}}>✕</button>
+          </div>
+          <div style={{display:"flex",gap:11,padding:13,background:"rgba(255,255,255,.04)",borderRadius:12,border:"1px solid rgba(255,255,255,.08)",marginBottom:17}}>
+            <Av name={doc.name} sz={44}/><div><div style={{fontWeight:700,color:"#fff",fontSize:14}}>{doc.name}</div><span className="tag tag-v" style={{marginTop:3,display:"inline-block"}}>{doc.spec}</span><div style={{marginTop:6,color:"#a78bfa",fontWeight:800,fontSize:16}}>₹{doc.fees}</div></div>
+          </div>
+          {alreadyThisDr&&<div style={{background:"rgba(220,38,38,.1)",border:"1px solid rgba(220,38,38,.22)",borderRadius:10,padding:"10px 13px",marginBottom:13,color:"#f87171",fontSize:12.5}}>⚠️ Aapne aaj is doctor ke saath pehle se appointment li hai.</div>}
+          <div style={{marginBottom:15}}>
+            <label className="lbl">TIME SLOTS {myTodaySlots.length>0&&<span style={{color:"#fcd34d",fontWeight:600,fontSize:9}}>— 🔒 LOCKED slots aaj already booked hain</span>}</label>
+            <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+              {doc.slots.map(s=>{
+                const drBooked=doc.bk.includes(s);
+                const userHasSlot=myTodaySlots.includes(s);
+                const pos=myWlPos(s);const wlCount=(doc.waitlist||{})[s]?.length||0;
+                if(userHasSlot&&!drBooked)return <div key={s} className="slot-chip" style={{background:"rgba(217,119,6,.12)",borderColor:"rgba(217,119,6,.3)",color:"#fbbf24",cursor:"not-allowed"}} title="Aapki is slot pe aaj already appointment hai">🔒 {s}</div>;
+                if(!drBooked)return <button key={s} className={"slot-chip"+(sel===s?" sel":"")} onClick={()=>{setSel(s);setBookErr("");}}>🟢 {s}</button>;
+                if(pos>=0)return <div key={s} className="slot-chip mywl" title={"You're #"+(pos+1)+" on waitlist"}>⏳ {s} <span style={{fontSize:10,opacity:.65}}>#{pos+1}</span></div>;
+                return <button key={s} className="slot-chip wl-join" onClick={()=>joinWL(s)}>🔴 {s}{wlCount>0&&<span style={{fontSize:10,marginLeft:4,opacity:.7}}>({wlCount})</span>}</button>;
+              })}
+            </div>
+            <div style={{fontSize:10.5,color:"rgba(255,255,255,.22)",marginTop:7,display:"flex",gap:10,flexWrap:"wrap"}}><span>🟢 Free</span><span>🔴 Booked (join waitlist)</span><span>🔒 Aapki aaj is slot pe appointment</span><span>⏳ Waitlist</span></div>
+          </div>
+          {wlDone&&<div style={{background:"rgba(217,119,6,.09)",border:"1px solid rgba(217,119,6,.22)",borderRadius:10,padding:"10px 13px",marginBottom:13,color:"#fcd34d",fontSize:12.5}}>✅ Joined waitlist for <strong>{wlDone}</strong>! Popup notification when slot opens.</div>}
+          {bookErr&&<div style={{background:"rgba(220,38,38,.1)",border:"1px solid rgba(220,38,38,.22)",borderRadius:10,padding:"10px 13px",marginBottom:13,color:"#f87171",fontSize:12.5}}>⚠️ {bookErr}</div>}
+          <div style={{marginBottom:15}}><label className="lbl">NOTES FOR DOCTOR (Optional)</label><textarea className="inp" rows={3} placeholder="Briefly describe your symptoms..." value={notes} onChange={e=>setNotes(e.target.value)} style={{resize:"none"}}/></div>
+          <button className="btn-v" onClick={go} disabled={!sel||alreadyThisDr} style={{width:"100%",padding:"12px",fontSize:14,opacity:alreadyThisDr?.5:1}}>Confirm {sel?"@ "+sel:""}</button>
+        </>}
+      </div>
+    </div>
+  );
+}
+
+/* PATIENT DASHBOARD */
+function PatientDash({user,setUser,docs,setDocs,onLogout}){
+  const[tab,setTab]=useState("home");const[srch,setSrch]=useState("");const[fspec,setFspec]=useState("All");
+  const[bookDoc,setBookDoc]=useState(null);const[profOpen,setProfOpen]=useState(false);
+  const[pe,setPe]=useState({age:user.age||"",city:user.city||"",state:user.state||"",address:user.address||""});
+  const[slotPopup,setSlotPopup]=useState(null);const[toast,setToast]=useState(null);
+
+  useEffect(()=>{
+    const sync=()=>setDocs(LS.get("cl_docs",[]));
+    window.addEventListener("focus",sync);
+    document.addEventListener("visibilitychange",()=>document.visibilityState==="visible"&&sync());
+    return()=>window.removeEventListener("focus",sync);
+  },[]);
+  useEffect(()=>{
+    const check=()=>{
+      const freed=LS.get("cl_freed_slots",[]);const fresh=LS.get("cl_docs",[]);
+      const recent=freed.filter(f=>Date.now()-f.ts<10000);
+      for(const ev of recent){
+        const d=fresh.find(x=>x.id===ev.drId);if(!d)continue;
+        const wl=(d.waitlist||{})[ev.slot]||[];
+        if(wl[0]?.email===user.email){
+          setSlotPopup({drId:ev.drId,drName:d.name,slot:ev.slot,fees:d.fees,city:d.city,state:d.state});
+          LS.set("cl_freed_slots",freed.filter(f=>f.ts!==ev.ts));
+          setDocs(fresh);break;
+        }
+      }
+    };
+    check();
+    const iv=setInterval(check,2000);
+    const h=e=>{if(e.key==="cl_freed_slots"||e.key==="cl_docs"){setDocs(LS.get("cl_docs",[]));check();}};
+    window.addEventListener("storage",h);
+    return()=>{clearInterval(iv);window.removeEventListener("storage",h);};
+  },[user.email]);
+
+  const myWL=docs.flatMap(doc=>Object.entries(doc.waitlist||{}).flatMap(([slot,wl])=>{
+    const pos=wl.findIndex(w=>w.email===user.email);if(pos===-1)return[];
+    return[{drId:doc.id,drName:doc.name,spec:doc.spec,fees:doc.fees,slot,position:pos+1,ahead:pos,total:wl.length,city:doc.city}];
+  }));
+
+  const book=(doctor,slot,notes)=>{
+    const a={id:Date.now(),drId:doctor.id,drName:doctor.name,spec:doctor.spec,slot,date:new Date().toLocaleDateString("en-IN"),fees:doctor.fees,notes,status:"Confirmed"};
+    setUser(u=>({...u,apts:[...u.apts,a]}));
+    setDocs(ds=>ds.map(d=>{if(d.id!==doctor.id)return d;const wl={...(d.waitlist||{})};if(wl[slot])wl[slot]=wl[slot].filter(w=>w.email!==user.email);return{...d,bk:[...d.bk,slot],waitlist:wl,apts:[...d.apts,{...a,pName:user.name,pPhone:user.phone}]};}));
+  };
+  const joinWL=(drId,slot)=>{
+    setDocs(ds=>ds.map(d=>{if(d.id!==drId)return d;const wl={...(d.waitlist||{})};const sw=wl[slot]||[];if(sw.some(w=>w.email===user.email))return d;wl[slot]=[...sw,{id:Date.now(),pName:user.name,pPhone:user.phone,email:user.email,joinedAt:new Date().toISOString()}];return{...d,waitlist:wl};}));
+    setToast({msg:"Added to waiting list! Stay on this page for instant notifications.",type:"notify"});
+  };
+  const cancelApt=id=>{
+    const a=user.apts.find(x=>x.id===id);if(!a)return;
+    setUser(u=>({...u,apts:u.apts.map(x=>x.id===id?{...x,status:"Cancelled"}:x)}));
+    setDocs(ds=>ds.map(d=>{if(d.name!==a.drName)return d;const freed=LS.get("cl_freed_slots",[]);freed.push({drId:d.id,drName:d.name,slot:a.slot,cancelledBy:user.name,ts:Date.now()});LS.set("cl_freed_slots",freed);return{...d,bk:d.bk.filter(s=>s!==a.slot),apts:d.apts.map(x=>x.id===id?{...x,status:"Cancelled by Patient"}:x)};}));
+    setToast({msg:"Appointment cancelled. Waiting list patients notified!",type:"notify"});
+  };
+
+  const allSpecs=["All",...Array.from(new Set(docs.map(d=>d.spec)))];
+  const filtered=docs.filter(d=>{
+    const ms=fspec==="All"||d.spec===fspec;
+    const mq=d.name.toLowerCase().includes(srch.toLowerCase())||d.spec.toLowerCase().includes(srch.toLowerCase())||(d.city||"").toLowerCase().includes(srch.toLowerCase());
+    return ms&&mq;
+  });
+  const navItems=[{k:"home",i:"🏠",l:"Home"},{k:"doctors",i:"🩺",l:"Find Doctors"},{k:"apts",i:"📅",l:"My Appointments"},{k:"waitlist",i:"⏳",l:"Waiting List",badge:myWL.length||null},{k:"ai",i:"🤖",l:"AI Health Check"}];
+
+  return(
+    <div style={{display:"flex",minHeight:"100vh",background:"#080814"}}>
+      {toast&&<Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
+      {slotPopup&&<SlotPopup data={slotPopup} onBook={()=>{const d=docs.find(x=>x.id===slotPopup.drId);if(d)setBookDoc(d);setSlotPopup(null);}} onDismiss={()=>setSlotPopup(null)}/>}
+      <div style={{width:225,background:"rgba(255,255,255,.02)",borderRight:"1px solid rgba(255,255,255,.05)",display:"flex",flexDirection:"column",padding:"19px 11px",flexShrink:0,position:"sticky",top:0,height:"100vh",overflow:"hidden"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:26,padding:"0 5px"}}>
+          <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#7c3aed,#06b6d4)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>+</div>
+          <span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#c4b5fd,#67e8f9)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>CureLink</span>
+          <span className="tag tag-v" style={{fontSize:9,marginLeft:"auto",padding:"1px 6px"}}>PATIENT</span>
+        </div>
+        {navItems.map(n=>(
+          <div key={n.k} className={"nav"+(tab===n.k?" onV":"")} onClick={()=>setTab(n.k)}>
+            <span>{n.i}</span><span style={{flex:1}}>{n.l}</span>
+            {n.badge&&<span style={{background:"#7c3aed",color:"#fff",borderRadius:"20px",padding:"1px 7px",fontSize:10,fontWeight:800}}>{n.badge}</span>}
+          </div>
+        ))}
+        <div style={{flex:1}}/>
+        <div style={{borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:9}}>
+          <div className="nav" onClick={()=>setProfOpen(true)}><span>👤</span><span>My Profile</span></div>
+          <div className="nav" onClick={onLogout} style={{color:"rgba(248,113,113,.65)"}}><span>🚪</span><span>Logout</span></div>
+        </div>
+      </div>
+      <div style={{flex:1,overflowY:"auto",padding:"22px 26px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
+          <div>
+            <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:25,color:"#fff",fontWeight:700}}>
+              {tab==="home"&&("Hello, "+user.name.split(" ")[0]+" 👋")}
+              {tab==="doctors"&&"Find a Doctor"}
+              {tab==="apts"&&"My Appointments"}
+              {tab==="waitlist"&&"My Waiting List"}
+              {tab==="ai"&&"AI Health Check"}
+            </h2>
+            <p style={{color:"rgba(255,255,255,.22)",fontSize:11.5,marginTop:2}}>{new Date().toLocaleDateString("en-IN",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</p>
+          </div>
+          <button onClick={()=>setProfOpen(true)} style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.09)",borderRadius:9,padding:"7px 13px",cursor:"pointer"}}>
+            <Av name={user.name} sz={26}/><span style={{fontWeight:600,color:"rgba(255,255,255,.65)",fontSize:12.5}}>{user.name}</span>
+          </button>
+        </div>
+
+        {tab==="home"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:16}}>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:11}}>
+              {[{i:"📅",l:"Total Apts",v:user.apts.length,c:"#a78bfa"},{i:"✅",l:"Confirmed",v:user.apts.filter(a=>a.status==="Confirmed").length,c:"#6ee7b7"},{i:"🏥",l:"Online Docs",v:docs.filter(d=>d.on).length,c:"#67e8f9"},{i:"⏳",l:"On Waitlist",v:myWL.length,c:"#fcd34d"}].map(s=>(
+                <div key={s.l} className="stat"><div style={{fontSize:22,marginBottom:5}}>{s.i}</div><div style={{fontSize:21,fontWeight:800,color:s.c}}>{s.v}</div><div style={{color:"rgba(255,255,255,.28)",fontSize:11,marginTop:2}}>{s.l}</div></div>
+              ))}
+            </div>
+            <div style={{background:"linear-gradient(135deg,#3b0764,#1e1b4b,#052e16)",borderRadius:14,padding:"20px 24px",display:"flex",justifyContent:"space-between",alignItems:"center",border:"1px solid rgba(255,255,255,.08)",flexWrap:"wrap",gap:12}}>
+              <div><h3 style={{fontFamily:"'Playfair Display',serif",fontSize:19,color:"#fff",marginBottom:3}}>Book a Doctor Appointment</h3><p style={{color:"rgba(255,255,255,.38)",fontSize:12.5}}>{docs.filter(d=>d.on).length} doctors available in Phagwara & nearby</p></div>
+              <button className="btn-v" onClick={()=>setTab("doctors")}>Find Doctors →</button>
+            </div>
+            {myWL.length>0&&<div>
+              <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"#fff",marginBottom:11}}>⏳ Your Waiting List</h3>
+              {myWL.map(e=>(
+                <div key={e.drId+e.slot} className="row" style={{background:e.ahead===0?"rgba(5,150,105,.06)":"rgba(255,255,255,.03)",border:"1px solid "+(e.ahead===0?"rgba(5,150,105,.22)":"rgba(255,255,255,.07)")}}>
+                  <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                    <Av name={user.name} sz={36} g={e.ahead===0?["#059669","#0891b2"]:["#7c3aed","#4f46e5"]}/>
+                    <div>
+                      <div style={{fontWeight:700,color:"#fff",fontSize:13}}>{user.name}</div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,.3)",marginTop:2}}>{e.drName} • 🕒 {e.slot}</div>
+                    </div>
+                  </div>
+                  <div style={{textAlign:"right"}}>
+                    <div style={{background:e.ahead===0?"linear-gradient(135deg,#059669,#0891b2)":"linear-gradient(135deg,#d97706,#b45309)",borderRadius:10,padding:"5px 12px",display:"inline-block"}}>
+                      <span style={{color:"#fff",fontWeight:800,fontSize:16}}>#{e.position}</span>
+                    </div>
+                    <div style={{fontSize:10,color:"rgba(255,255,255,.28)",marginTop:3}}>{e.ahead===0?"Next! 🎉":e.ahead+" aage"}</div>
+                  </div>
+                </div>
+              ))}
+            </div>}
+            <div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:11}}>
+                <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"#fff"}}>Available Doctors</h3>
+                <button className="btn-ghost" onClick={()=>setTab("doctors")} style={{fontSize:11.5,padding:"6px 13px"}}>See All</button>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:12}}>
+                {docs.filter(d=>d.on).slice(0,4).map(d=>(
+                  <div key={d.id} className="dr-card" onClick={()=>setBookDoc(d)}>
+                    <div style={{display:"flex",gap:9,alignItems:"flex-start",marginBottom:9}}><Av name={d.name} sz={38}/><div><div style={{fontWeight:700,color:"#fff",fontSize:13}}>{d.name}</div><span className="tag tag-v" style={{marginTop:3,display:"inline-block",fontSize:10}}>{d.spec}</span></div><span className="tag tag-g" style={{marginLeft:"auto",flexShrink:0,fontSize:9}}>● Live</span></div>
+                    <div style={{fontSize:11.5,color:"rgba(255,255,255,.32)",marginBottom:9,display:"flex",justifyContent:"space-between"}}><span>📍 {d.city}</span><span style={{color:"#a78bfa",fontWeight:800}}>₹{d.fees}</span></div>
+                    <button className="btn-v" style={{width:"100%",padding:"8px",fontSize:12}}>Book Now</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        {tab==="doctors"&&(
+          <div>
+            <div style={{display:"flex",gap:9,marginBottom:16,flexWrap:"wrap"}}>
+              <input className="inp" placeholder="🔍  Search by name, speciality or city..." value={srch} onChange={e=>setSrch(e.target.value)} style={{flex:"1 1 200px"}}/>
+              <select className="inp" value={fspec} onChange={e=>setFspec(e.target.value)} style={{flex:"0 1 180px",cursor:"pointer"}}>{allSpecs.map(s=><option key={s}>{s}</option>)}</select>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:14}}>
+              {filtered.map(d=>(
+                <div key={d.id} className={"dr-card"+(!d.on?" off":"")} onClick={()=>d.on&&setBookDoc(d)}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}>
+                    <div style={{display:"flex",gap:10,alignItems:"flex-start"}}><Av name={d.name} sz={42}/><div><div style={{fontWeight:700,color:"#fff",fontSize:13.5}}>{d.name}</div><div style={{fontSize:10,color:"rgba(255,255,255,.22)",marginBottom:3}}>Reg: {d.id}</div><span className="tag tag-v" style={{fontSize:10}}>{d.spec}</span></div></div>
+                    <span className={"tag"+(d.on?" tag-g":" tag-r")} style={{fontSize:10}}>{d.on?"● Online":"○ Offline"}</span>
+                  </div>
+                  {d.quote&&<p style={{fontSize:11.5,color:"rgba(255,255,255,.28)",fontStyle:"italic",marginBottom:9,lineHeight:1.5}}>"{d.quote.slice(0,58)}{d.quote.length>58?"...":""}"</p>}
+                  <div style={{fontSize:11.5,color:"rgba(255,255,255,.32)",display:"flex",gap:9,marginBottom:10,flexWrap:"wrap"}}><span>📍 {d.city}, {d.state}</span><span>🕒 {d.slots.length-d.bk.length} free</span></div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontWeight:800,color:"#a78bfa",fontSize:16}}>₹{d.fees}</span>
+                    <button className={d.on?"btn-v":"btn-ghost"} disabled={!d.on} style={{fontSize:12,padding:"7px 14px",opacity:d.on?1:.5}}>{d.on?"Book / Waitlist":"Unavailable"}</button>
+                  </div>
+                </div>
+              ))}
+              {filtered.length===0&&<div style={{gridColumn:"1/-1",textAlign:"center",padding:"50px 0",color:"rgba(255,255,255,.18)"}}><div style={{fontSize:38}}>🔍</div><div style={{marginTop:9}}>No doctors found</div></div>}
+            </div>
+          </div>
+        )}
+        {tab==="apts"&&(
+          <div>
+            {user.apts.length===0?<div style={{textAlign:"center",padding:"65px 0",color:"rgba(255,255,255,.18)"}}><div style={{fontSize:42}}>📅</div><div style={{marginTop:9,fontSize:13.5}}>No appointments yet</div><button className="btn-v" onClick={()=>setTab("doctors")} style={{marginTop:14,fontSize:13}}>Book your first →</button></div>
+            :[...user.apts].reverse().map(a=>(
+              <div key={a.id} className="row" style={{padding:"14px 16px"}}>
+                <div style={{display:"flex",gap:11,alignItems:"center"}}><Av name={a.drName} sz={40}/>
+                  <div><div style={{fontWeight:700,color:"#fff",fontSize:13.5}}>{a.drName}</div><span className="tag tag-v" style={{display:"inline-block",marginTop:3,fontSize:10}}>{a.spec}</span><div style={{marginTop:4,fontSize:11.5,color:"rgba(255,255,255,.32)",display:"flex",gap:9,flexWrap:"wrap"}}><span>📅 {a.date}</span><span>🕒 {a.slot}</span><span>💰 ₹{a.fees}</span></div>{a.notes&&<div style={{marginTop:2,fontSize:11,color:"rgba(255,255,255,.22)"}}>📋 {a.notes}</div>}</div>
+                </div>
+                <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                  <span className={"tag"+(a.status==="Confirmed"?" tag-g":" tag-r")} style={{fontSize:10}}>{a.status}</span>
+                  {a.status==="Confirmed"&&<button className="btn-red" onClick={()=>cancelApt(a.id)}>Cancel</button>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {tab==="waitlist"&&(
+          <div>
+            {myWL.length===0?<div style={{textAlign:"center",padding:"65px 0",color:"rgba(255,255,255,.18)"}}><div style={{fontSize:42}}>⏳</div><div style={{marginTop:9,fontSize:13.5}}>Not on any waiting list</div><p style={{fontSize:11.5,marginTop:6,opacity:.55}}>Tap a booked (🔴) slot in Find Doctors to join its waitlist</p></div>
+            :<div>
+              <div style={{marginBottom:14,padding:12,background:"rgba(217,119,6,.06)",border:"1px solid rgba(217,119,6,.16)",borderRadius:11,fontSize:12.5,color:"rgba(255,255,255,.48)"}}>💡 Jaise hi slot free hogi, aapko <strong style={{color:"#fcd34d"}}>popup notification</strong> aayega. Page khula rakhein!</div>
+              {myWL.map(e=>(
+                <div key={e.drId+e.slot} style={{marginBottom:12,background:"rgba(255,255,255,.03)",border:"1.5px solid "+(e.ahead===0?"rgba(5,150,105,.35)":"rgba(255,255,255,.07)"),borderRadius:14,overflow:"hidden",position:"relative"}}>
+                  {/* Top accent bar */}
+                  <div style={{height:3,background:e.ahead===0?"linear-gradient(90deg,#10b981,#06b6d4)":"linear-gradient(90deg,#d97706,#b45309)"}}/>
+                  <div style={{padding:"16px 18px"}}>
+                    {/* Patient row — main focus */}
+                    <div style={{display:"flex",alignItems:"center",gap:13,marginBottom:14}}>
+                      <Av name={user.name} sz={50} g={e.ahead===0?["#059669","#0891b2"]:["#7c3aed","#4f46e5"]}/>
+                      <div style={{flex:1}}>
+                        <div style={{fontWeight:800,color:"#fff",fontSize:15}}>{user.name}</div>
+                        <div style={{color:"rgba(255,255,255,.35)",fontSize:12,marginTop:2}}>+91 {user.phone}</div>
+                      </div>
+                      {/* Queue number — BIG and prominent */}
+                      <div style={{textAlign:"center",background:e.ahead===0?"linear-gradient(135deg,#059669,#0891b2)":"linear-gradient(135deg,#d97706,#b45309)",borderRadius:14,padding:"10px 18px",minWidth:72}}>
+                        <div style={{color:"rgba(255,255,255,.65)",fontSize:9,fontWeight:800,letterSpacing:"1px",marginBottom:2}}>YOUR NO.</div>
+                        <div style={{color:"#fff",fontWeight:900,fontSize:28,lineHeight:1}}>#{e.position}</div>
+                        <div style={{color:"rgba(255,255,255,.7)",fontSize:9,marginTop:2}}>in queue</div>
+                      </div>
+                    </div>
+                    {/* Doctor info — secondary */}
+                    <div style={{background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.07)",borderRadius:10,padding:"10px 13px",display:"flex",alignItems:"center",gap:10}}>
+                      <Av name={e.drName} sz={34}/>
+                      <div style={{flex:1}}>
+                        <div style={{fontWeight:600,color:"rgba(255,255,255,.75)",fontSize:12.5}}>{e.drName}</div>
+                        <div style={{fontSize:11,color:"rgba(255,255,255,.3)",marginTop:2,display:"flex",gap:8,flexWrap:"wrap"}}><span>🩺 {e.spec}</span><span>🕒 {e.slot}</span><span>📍 {e.city}</span><span>💰 ₹{e.fees}</span></div>
+                      </div>
+                    </div>
+                    {/* Status line */}
+                    <div style={{marginTop:10,display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:6}}>
+                      <div style={{fontSize:12,color:e.ahead===0?"#6ee7b7":"rgba(255,255,255,.35)",fontWeight:e.ahead===0?700:400}}>
+                        {e.ahead===0?"🎉 Aap NEXT hain! Slot free hote hi popup aayega.":e.ahead===1?"1 patient aage hai aapke":""+e.ahead+" patients aage hain aapke"}
+                      </div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,.22)"}}>Total {e.total} waiting</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>}
+          </div>
+        )}
+        {tab==="ai"&&<div style={{background:"rgba(255,255,255,.02)",borderRadius:14,border:"1px solid rgba(255,255,255,.06)",overflow:"hidden"}}><AiCheck/></div>}
+      </div>
+
+      {profOpen&&<div className="overlay" onClick={e=>e.target===e.currentTarget&&setProfOpen(false)}>
+        <div className="modal">
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:17}}><h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"#fff"}}>My Profile</h3><button onClick={()=>setProfOpen(false)} style={{background:"none",border:"none",fontSize:19,cursor:"pointer",color:"rgba(255,255,255,.28)"}}>✕</button></div>
+          <div style={{display:"flex",gap:11,alignItems:"center",marginBottom:17,padding:12,background:"rgba(124,58,237,.07)",borderRadius:11,border:"1px solid rgba(124,58,237,.15)"}}><Av name={user.name} sz={46}/><div><div style={{fontWeight:700,color:"#fff",fontSize:14.5}}>{user.name}</div><div style={{color:"rgba(255,255,255,.32)",fontSize:11.5,marginTop:2}}>{user.email} • +91 {user.phone}</div></div></div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:11}}>
+            {[["Age","age","number"],["City","city","text"],["State","state","text"],["Address","address","text"]].map(([lb,k,t])=>(
+              <div key={k} style={{gridColumn:k==="address"?"1/-1":"auto"}}><label className="lbl">{lb.toUpperCase()}</label><input className="inp" type={t} value={pe[k]||""} onChange={e=>setPe({...pe,[k]:e.target.value})} placeholder={"Enter "+lb.toLowerCase()}/></div>
+            ))}
+          </div>
+          <button className="btn-v" onClick={()=>{setUser(u=>({...u,...pe}));setProfOpen(false);}} style={{marginTop:15,width:"100%",padding:11}}>Save Profile</button>
+        </div>
+      </div>}
+      {bookDoc&&<BookModal doc={bookDoc} user={user} onClose={()=>setBookDoc(null)} onBook={book} onJoinWaitlist={joinWL}/>}
+    </div>
+  );
+}
+
+/* DOCTOR DASHBOARD */
+function DoctorDash({loginInfo,docs,setDocs,onLogout}){
+  const[tab,setTab]=useState("home");const[profOpen,setProfOpen]=useState(false);const[slotEdit,setSlotEdit]=useState(false);
+  const[tmpSlots,setTmpSlots]=useState([]);const[toast,setToast]=useState(null);
+  const[qi]=useState(Math.floor(Math.random()*QUOTES.length));
+  const doc=docs.find(d=>d.id===loginInfo.id)||loginInfo;
+  const[pe,setPe]=useState({age:doc.age||"",city:doc.city||"",state:doc.state||"",fees:doc.fees||"",quote:doc.quote||""});
+
+  useEffect(()=>{
+    const sync=()=>setDocs(LS.get("cl_docs",[]));
+    window.addEventListener("focus",sync);document.addEventListener("visibilitychange",()=>document.visibilityState==="visible"&&sync());
+    return()=>window.removeEventListener("focus",sync);
+  },[]);
+  useEffect(()=>{const t=setInterval(()=>setDocs(LS.get("cl_docs",[])),2500);return()=>clearInterval(t);},[]);
+
+  const toggle=()=>setDocs(ds=>ds.map(d=>d.id===doc.id?{...d,on:!d.on}:d));
+  const cancelPat=(aptId,slot)=>{
+    setDocs(ds=>ds.map(d=>{if(d.id!==doc.id)return d;const freed=LS.get("cl_freed_slots",[]);freed.push({drId:d.id,drName:d.name,slot,cancelledBy:"Doctor",ts:Date.now()});LS.set("cl_freed_slots",freed);return{...d,bk:d.bk.filter(s=>s!==slot),apts:d.apts.map(a=>a.id===aptId?{...a,status:"Cancelled by Doctor"}:a)};}));
+    setToast({msg:"Appointment cancelled. Waiting list patients notified.",type:"ok"});
+  };
+  const saveProfile=()=>{setDocs(ds=>ds.map(d=>d.id===doc.id?{...d,...pe,fees:+pe.fees}:d));setProfOpen(false);setToast({msg:"Profile updated!",type:"ok"});};
+  const openSlotEdit=()=>{setTmpSlots([...doc.slots]);setSlotEdit(true);};
+  const togTmp=t=>setTmpSlots(s=>s.includes(t)?s.filter(x=>x!==t):sortTimes([...s,t]));
+  const saveSlots=()=>{setDocs(ds=>ds.map(d=>d.id===doc.id?{...d,slots:sortTimes(tmpSlots),bk:d.bk.filter(s=>tmpSlots.includes(s))}:d));setSlotEdit(false);setToast({msg:"Slots updated! "+tmpSlots.length+" active.",type:"ok"});};
+  const wlBySlot=doc.slots.reduce((acc,s)=>{acc[s]=(doc.waitlist||{})[s]||[];return acc;},{});
+  const totalWl=Object.values(wlBySlot).reduce((s,w)=>s+w.length,0);
+  const navItems=[{k:"home",i:"🏠",l:"Dashboard"},{k:"apts",i:"📋",l:"Appointments"},{k:"waitlist",i:"⏳",l:"Waiting Lists",badge:totalWl||null},{k:"slots",i:"🕒",l:"My Slots"}];
+
+  return(
+    <div style={{display:"flex",minHeight:"100vh",background:"#040f0d"}}>
+      {toast&&<Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
+      <div style={{width:225,background:"rgba(5,150,105,.03)",borderRight:"1px solid rgba(5,150,105,.09)",display:"flex",flexDirection:"column",padding:"19px 11px",flexShrink:0,position:"sticky",top:0,height:"100vh",overflow:"hidden"}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:26,padding:"0 5px"}}>
+          <div style={{width:28,height:28,borderRadius:8,background:"linear-gradient(135deg,#059669,#0891b2)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>+</div>
+          <span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:900,background:"linear-gradient(135deg,#6ee7b7,#67e8f9)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>CureLink</span>
+          <span className="tag tag-g" style={{fontSize:9,marginLeft:"auto",padding:"1px 6px"}}>DOCTOR</span>
+        </div>
+        {navItems.map(n=>(
+          <div key={n.k} className={"nav"+(tab===n.k?" onG":"")} onClick={()=>setTab(n.k)}>
+            <span>{n.i}</span><span style={{flex:1}}>{n.l}</span>
+            {n.badge&&<span style={{background:"#d97706",color:"#fff",borderRadius:"20px",padding:"1px 7px",fontSize:10,fontWeight:800}}>{n.badge}</span>}
+          </div>
+        ))}
+        <div style={{flex:1}}/>
+        <div style={{background:"rgba(5,150,105,.07)",border:"1px solid rgba(5,150,105,.14)",borderRadius:11,padding:"11px 12px",marginBottom:9}}>
+          <div className="lbl" style={{marginBottom:7}}>AVAILABILITY</div>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <span style={{color:doc.on?"#6ee7b7":"#f87171",fontSize:12,fontWeight:700}}>{doc.on?"● Online":"○ Offline"}</span>
+            <label className="toggle"><input type="checkbox" checked={doc.on} onChange={toggle}/><span className="tsl"/></label>
+          </div>
+        </div>
+        <div style={{borderTop:"1px solid rgba(255,255,255,.06)",paddingTop:9}}>
+          <div className="nav" onClick={()=>setProfOpen(true)}><span>👤</span><span>Profile</span></div>
+          <div className="nav" onClick={onLogout} style={{color:"rgba(248,113,113,.6)"}}><span>🚪</span><span>Logout</span></div>
+        </div>
+      </div>
+      <div style={{flex:1,overflowY:"auto",padding:"22px 26px"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:22}}>
+          <div>
+            <h2 style={{fontFamily:"'Playfair Display',serif",fontSize:25,color:"#fff",fontWeight:700}}>
+              {tab==="home"&&("Welcome, "+doc.name+" 👨‍⚕️")}
+              {tab==="apts"&&"Patient Appointments"}
+              {tab==="waitlist"&&"Waiting Lists"}
+              {tab==="slots"&&"My Time Slots"}
+            </h2>
+            <p style={{color:"rgba(255,255,255,.22)",fontSize:11.5,marginTop:2}}>{new Date().toLocaleDateString("en-IN",{weekday:"long",year:"numeric",month:"long",day:"numeric"})}</p>
+          </div>
+          <button onClick={()=>setProfOpen(true)} style={{display:"flex",alignItems:"center",gap:8,background:"rgba(255,255,255,.03)",border:"1px solid rgba(5,150,105,.2)",borderRadius:9,padding:"7px 13px",cursor:"pointer"}}>
+            <Av name={doc.name} sz={26} g={["#059669","#0891b2"]}/><span style={{fontWeight:600,color:"rgba(255,255,255,.62)",fontSize:12.5}}>{doc.name}</span>
+          </button>
+        </div>
+
+        {tab==="home"&&(
+          <div style={{display:"flex",flexDirection:"column",gap:16}}>
+            <div style={{background:"linear-gradient(135deg,#052e16,#042f2e,#1e1b4b)",borderRadius:14,padding:"20px 24px",border:"1px solid rgba(255,255,255,.07)"}}>
+              <div style={{fontSize:20,marginBottom:6}}>💬</div>
+              <blockquote style={{fontFamily:"'Playfair Display',serif",fontSize:17,fontStyle:"italic",color:"rgba(255,255,255,.82)",lineHeight:1.55}}>{doc.quote?('"'+doc.quote+'"'):('"'+QUOTES[qi]+'"')}</blockquote>
+              <p style={{color:"rgba(255,255,255,.2)",marginTop:7,fontSize:10.5}}>— Your daily inspiration</p>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:11}}>
+              {[{i:"📋",l:"Booked",v:doc.apts.length,c:"#67e8f9"},{i:"✅",l:"Confirmed",v:doc.apts.filter(a=>a.status==="Confirmed").length,c:"#6ee7b7"},{i:"🕒",l:"Free Slots",v:doc.slots.length-doc.bk.length,c:"#fcd34d"},{i:"⏳",l:"Waitlist",v:totalWl,c:"#fbbf24"}].map(s=>(
+                <div key={s.l} className="stat"><div style={{fontSize:21,marginBottom:4}}>{s.i}</div><div style={{fontSize:20,fontWeight:800,color:s.c}}>{s.v}</div><div style={{color:"rgba(255,255,255,.26)",fontSize:11,marginTop:2}}>{s.l}</div></div>
+              ))}
+            </div>
+            <div style={{background:"rgba(255,255,255,.025)",border:"1px solid rgba(255,255,255,.06)",borderRadius:14,padding:17}}>
+              <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:18,color:"#fff",marginBottom:13}}>Today's Confirmed Patients</h3>
+              {doc.apts.filter(a=>a.status==="Confirmed").length===0?<div style={{textAlign:"center",padding:"16px 0",color:"rgba(255,255,255,.16)"}}><div style={{fontSize:28}}>📋</div><div style={{fontSize:12.5,marginTop:6}}>No confirmed appointments yet</div></div>
+              :doc.apts.filter(a=>a.status==="Confirmed").slice(0,6).map(a=>(
+                <div key={a.id} className="row"><div style={{display:"flex",gap:9,alignItems:"center"}}><Av name={a.pName} sz={32} g={["#059669","#0891b2"]}/><div><div style={{fontWeight:600,color:"#fff",fontSize:13}}>{a.pName}</div><div style={{fontSize:11,color:"rgba(255,255,255,.28)"}}>🕒 {a.slot}</div></div></div><span className="tag tag-g" style={{fontSize:10}}>Confirmed</span></div>
+              ))}
+            </div>
+          </div>
+        )}
+        {tab==="apts"&&(
+          <div>
+            {doc.apts.length===0?<div style={{textAlign:"center",padding:"65px 0",color:"rgba(255,255,255,.16)"}}><div style={{fontSize:40}}>📋</div><div style={{marginTop:9,fontSize:13.5}}>No appointments yet</div><p style={{fontSize:11.5,marginTop:5,opacity:.55}}>Patients will appear here once they book from the Patient Portal</p></div>
+            :[...doc.apts].reverse().map(a=>(
+              <div key={a.id} className="row" style={{padding:"14px 16px"}}>
+                <div style={{display:"flex",gap:11,alignItems:"center"}}><Av name={a.pName} sz={40} g={["#059669","#0891b2"]}/>
+                  <div><div style={{fontWeight:700,color:"#fff",fontSize:13.5}}>{a.pName}</div><div style={{fontSize:11.5,color:"rgba(255,255,255,.3)",marginTop:3}}>📅 {a.date} • 🕒 {a.slot} • 📞 {a.pPhone}</div>{a.notes&&<div style={{fontSize:11,color:"rgba(255,255,255,.22)",marginTop:2}}>📋 {a.notes}</div>}</div>
+                </div>
+                <div style={{display:"flex",gap:7,alignItems:"center"}}>
+                  <span className={"tag"+(a.status==="Confirmed"?" tag-g":" tag-r")} style={{fontSize:10}}>{a.status}</span>
+                  {a.status==="Confirmed"&&<button className="btn-red" onClick={()=>cancelPat(a.id,a.slot)}>Cancel (No-show)</button>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {tab==="waitlist"&&(
+          <div>
+            <div style={{marginBottom:14,padding:12,background:"rgba(217,119,6,.06)",border:"1px solid rgba(217,119,6,.15)",borderRadius:11,fontSize:12.5,color:"rgba(255,255,255,.45)"}}>
+              💡 When you cancel a patient, the <strong style={{color:"#fcd34d"}}>first person on that slot's waitlist</strong> gets an instant popup notification.
+            </div>
+            {doc.slots.every(s=>!wlBySlot[s]?.length)?<div style={{textAlign:"center",padding:"65px 0",color:"rgba(255,255,255,.16)"}}><div style={{fontSize:40}}>⏳</div><div style={{marginTop:9,fontSize:13.5}}>No waiting lists yet</div></div>
+            :doc.slots.filter(s=>wlBySlot[s]?.length>0).map(s=>(
+              <div key={s} className="card" style={{marginBottom:13}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:11}}>
+                  <div><div style={{fontWeight:700,color:"#fff",fontSize:14.5}}>🕒 {s}</div><div style={{fontSize:11.5,color:"rgba(255,255,255,.3)",marginTop:2}}>{doc.bk.includes(s)?"🔴 Slot Booked":"🟢 Slot Free"}</div></div>
+                  <span className="tag tag-y">{wlBySlot[s].length} waiting</span>
+                </div>
+                {wlBySlot[s].map((w,idx)=>(
+                  <div key={w.id} style={{display:"flex",alignItems:"center",gap:9,padding:"9px 11px",background:"rgba(255,255,255,.02)",borderRadius:9,marginBottom:6,border:"1px solid rgba(255,255,255,.05)"}}>
+                    <div style={{width:22,height:22,borderRadius:"50%",background:idx===0?"linear-gradient(135deg,#d97706,#b45309)":"rgba(255,255,255,.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:800,color:"#fff",flexShrink:0}}>#{idx+1}</div>
+                    <Av name={w.pName} sz={30} g={["#7c3aed","#4f46e5"]}/>
+                    <div style={{flex:1}}><div style={{fontWeight:600,color:"#fff",fontSize:12.5}}>{w.pName}</div><div style={{fontSize:11,color:"rgba(255,255,255,.26)"}}>📞 {w.pPhone} • {new Date(w.joinedAt).toLocaleDateString("en-IN")}</div></div>
+                    {idx===0&&<span className="tag tag-y" style={{fontSize:10}}>Next</span>}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+        {tab==="slots"&&(
+          <div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:13}}>
+              <div><h3 style={{fontFamily:"'Playfair Display',serif",fontSize:19,color:"#fff",marginBottom:2}}>Your Time Slots</h3><p style={{color:"rgba(255,255,255,.24)",fontSize:12}}>Manage when you're available for patients</p></div>
+              <button className="btn-g" onClick={openSlotEdit} style={{fontSize:12.5,padding:"9px 16px"}}>Edit Slots</button>
+            </div>
+            {doc.slots.length===0?<div style={{textAlign:"center",padding:"55px 0",color:"rgba(255,255,255,.16)"}}><div style={{fontSize:38}}>🕒</div><div style={{marginTop:8}}>No slots yet</div><button className="btn-g" onClick={openSlotEdit} style={{marginTop:12,fontSize:12.5}}>Add slots →</button></div>
+            :<div>
+              <div style={{display:"flex",gap:7,marginBottom:12,flexWrap:"wrap"}}>
+                <span className="tag tag-b" style={{fontSize:10}}>{doc.slots.length} total</span>
+                <span className="tag tag-g" style={{fontSize:10}}>{doc.slots.length-doc.bk.length} free</span>
+                <span className="tag tag-r" style={{fontSize:10}}>{doc.bk.length} booked</span>
+                {totalWl>0&&<span className="tag tag-y" style={{fontSize:10}}>{totalWl} on waitlist</span>}
+              </div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+                {doc.slots.map(s=>{const booked=doc.bk.includes(s);const wl=wlBySlot[s]?.length||0;return(
+                  <div key={s} style={{padding:"9px 14px",borderRadius:9,background:booked?"rgba(220,38,38,.07)":"rgba(5,150,105,.07)",border:"1.5px solid "+(booked?"rgba(220,38,38,.2)":"rgba(5,150,105,.2)"),color:booked?"#f87171":"#6ee7b7",fontWeight:700,fontSize:12,display:"flex",alignItems:"center",gap:6}}>
+                    {booked?"🔴":"🟢"}{s}
+                    {wl>0&&<span style={{background:"rgba(217,119,6,.22)",color:"#fcd34d",borderRadius:"20px",padding:"1px 7px",fontSize:9,fontWeight:800}}>{wl} waiting</span>}
+                  </div>
+                );})}
+              </div>
+            </div>}
+          </div>
+        )}
+      </div>
+
+      {profOpen&&<div className="overlay" onClick={e=>e.target===e.currentTarget&&setProfOpen(false)}>
+        <div className="modal" style={{borderColor:"rgba(5,150,105,.15)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:17}}><h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"#fff"}}>Doctor Profile</h3><button onClick={()=>setProfOpen(false)} style={{background:"none",border:"none",fontSize:19,cursor:"pointer",color:"rgba(255,255,255,.28)"}}>✕</button></div>
+          <div style={{display:"flex",gap:11,alignItems:"center",marginBottom:17,padding:12,background:"rgba(5,150,105,.06)",borderRadius:11,border:"1px solid rgba(5,150,105,.14)"}}><Av name={doc.name} sz={46} g={["#059669","#0891b2"]}/><div><div style={{fontWeight:700,color:"#fff",fontSize:14.5}}>{doc.name}</div><span className="tag tag-g" style={{marginTop:3,display:"inline-block"}}>{doc.spec}</span><div style={{fontSize:11,color:"rgba(255,255,255,.28)",marginTop:2}}>Reg: {doc.id}</div></div></div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:11}}>
+            {[["Age","age","number"],["Fees (₹)","fees","number"],["City","city","text"],["State","state","text"]].map(([lb,k,t])=>(
+              <div key={k}><label className="lbl">{lb.toUpperCase()}</label><input className="inp" type={t} value={pe[k]} onChange={e=>setPe({...pe,[k]:e.target.value})} placeholder={"Enter "+lb}/></div>
+            ))}
+            <div style={{gridColumn:"1/-1"}}><label className="lbl">PROFESSIONAL QUOTE</label><input className="inp" value={pe.quote} onChange={e=>setPe({...pe,quote:e.target.value})} placeholder="Share a thought with patients..."/></div>
+          </div>
+          <button className="btn-g" onClick={saveProfile} style={{marginTop:15,width:"100%",padding:11}}>Save Profile</button>
+        </div>
+      </div>}
+      {slotEdit&&<div className="overlay" onClick={e=>e.target===e.currentTarget&&setSlotEdit(false)}>
+        <div className="modal" style={{maxWidth:610,borderColor:"rgba(5,150,105,.15)"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:13}}><div><h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,color:"#fff"}}>Edit Time Slots</h3><p style={{color:"rgba(255,255,255,.28)",fontSize:12.5,marginTop:2}}>{tmpSlots.length} selected</p></div><button onClick={()=>setSlotEdit(false)} style={{background:"none",border:"none",fontSize:19,cursor:"pointer",color:"rgba(255,255,255,.28)"}}>✕</button></div>
+          <div style={{display:"flex",gap:7,marginBottom:13}}>
+            <button className="btn-ghost" onClick={()=>setTmpSlots([])} style={{fontSize:10,padding:"2px 10px"}}>Clear all</button>
+            <button className="btn-ghost" onClick={()=>setTmpSlots([...ALL_TIMES])} style={{fontSize:10,padding:"2px 10px"}}>Select all</button>
+          </div>
+          {[["🌅 MORNING",ALL_TIMES.filter(t=>t.includes("AM"))],["🌤️ AFTERNOON & EVENING",ALL_TIMES.filter(t=>t.includes("PM"))]].map(([hd,slots])=>(
+            <div key={hd} style={{marginBottom:12}}>
+              <div className="lbl" style={{marginBottom:7}}>{hd}</div>
+              <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{slots.map(t=><button key={t} className={"time-btn"+(tmpSlots.includes(t)?" picked":"")} onClick={()=>togTmp(t)}>{t}</button>)}</div>
+            </div>
+          ))}
+          {tmpSlots.length>0&&<div style={{background:"rgba(5,150,105,.06)",border:"1px solid rgba(5,150,105,.15)",borderRadius:9,padding:10,marginBottom:12}}><div className="lbl" style={{color:"#6ee7b7",marginBottom:5}}>ACTIVE SLOTS ({tmpSlots.length})</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{tmpSlots.map(s=><span key={s} className="tag tag-g" style={{fontSize:9.5}}>{s}</span>)}</div></div>}
+          <div style={{display:"flex",gap:8}}>
+            <button className="btn-ghost" onClick={()=>setSlotEdit(false)}>Cancel</button>
+            <button className="btn-g" onClick={saveSlots} style={{flex:1,padding:11,fontSize:13}}>Save Slots ({tmpSlots.length} selected)</button>
+          </div>
+        </div>
+      </div>}
+    </div>
+  );
+}
+
+/* ROOT APP */
+function App(){
+  const[docs,setDocsRaw]=useState(()=>LS.get("cl_docs",[]));
+  const setDocs=upd=>{setDocsRaw(prev=>{const next=typeof upd==="function"?upd(prev):upd;LS.set("cl_docs",next);return next;});};
+  const[screen,setScreen]=useState("landing");
+  const[curUser,setCurUserRaw]=useState(null);
+  const setUser=upd=>{setCurUserRaw(prev=>{const next=typeof upd==="function"?upd(prev):upd;if(next){LS.set("cl_cur_user",next);const all=LS.get("cl_all_users",{});all[next.email.toLowerCase()]=next;LS.set("cl_all_users",all);}return next;});};
+  const[curDrId,setCurDrId]=useState(null);const[tempDr,setTempDr]=useState(null);
+  const curDoc=docs.find(d=>d.id===curDrId)||null;
+  const[toast,setToast]=useState(null);
+
+  const handleUserLogin=f=>{
+    const all=LS.get("cl_all_users",{});const key=f.email.toLowerCase();
+    if(all[key]&&all[key].phone===f.phone){
+      const saved=all[key];setCurUserRaw(saved);LS.set("cl_cur_user",saved);
+      setToast({msg:"Welcome back, "+saved.name.split(" ")[0]+"! Your account restored.",type:"ok"});
+    }else{
+      const nu={...f,age:"",city:"",state:"",address:"",apts:[]};
+      all[key]=nu;LS.set("cl_all_users",all);LS.set("cl_cur_user",nu);setCurUserRaw(nu);
+      setToast({msg:"Welcome to CureLink, "+nu.name.split(" ")[0]+"!",type:"new"});
+    }
+    setScreen("userDash");
+  };
+  const handleDrLogin=info=>{
+    const existing=docs.find(d=>d.id===info.regId);
+    if(existing){setCurDrId(existing.id);setToast({msg:"Welcome back, "+existing.name+"! 👨‍⚕️",type:"ok"});setScreen("doctorDash");}
+    else{setTempDr(info);setScreen("doctorSetup");}
+  };
+  const handleSetupComplete=fullDoc=>{
+    const doc={...fullDoc,id:tempDr.regId};
+    setDocs(ds=>[...ds,doc]);setCurDrId(doc.id);
+    setToast({msg:"Welcome to CureLink, "+doc.name+"!",type:"new"});
+    setScreen("doctorDash");
+  };
+  const logoutUser=()=>{setCurUserRaw(null);setScreen("landing");};
+  const logoutDoctor=()=>{setCurDrId(null);setScreen("landing");};
+
+  return(
+    <div>
+      {toast&&<Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
+      {screen==="landing"&&<Landing onChoice={c=>setScreen(c==="user"?"userLogin":"doctorLogin")}/>}
+      {screen==="userLogin"&&<PatientLogin onBack={()=>setScreen("landing")} onLogin={handleUserLogin}/>}
+      {screen==="doctorLogin"&&<DoctorLogin onBack={()=>setScreen("landing")} onLogin={handleDrLogin}/>}
+      {screen==="doctorSetup"&&tempDr&&<DoctorSetup loginInfo={tempDr} onComplete={handleSetupComplete}/>}
+      {screen==="userDash"&&curUser&&<PatientDash user={curUser} setUser={setUser} docs={docs} setDocs={setDocs} onLogout={logoutUser}/>}
+      {screen==="doctorDash"&&curDoc&&<DoctorDash loginInfo={curDoc} docs={docs} setDocs={setDocs} onLogout={logoutDoctor}/>}
+      {screen==="userDash"&&!curUser&&<Landing onChoice={c=>setScreen(c==="user"?"userLogin":"doctorLogin")}/>}
+      {screen==="doctorDash"&&!curDoc&&<Landing onChoice={c=>setScreen(c==="user"?"userLogin":"doctorLogin")}/>}
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
